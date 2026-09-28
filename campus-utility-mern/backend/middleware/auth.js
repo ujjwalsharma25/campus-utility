@@ -1,0 +1,32 @@
+const jwt = require('jsonwebtoken');
+
+// Reads "Authorization: Bearer <token>", verifies it, and attaches the decoded
+// payload ({ id, role, name }) to req.user. Every protected route uses this.
+function requireAuth(req, res, next) {
+  const header = req.headers.authorization || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+
+  if (!token) {
+    return res.status(401).json({ error: 'Missing or invalid Authorization header' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid or expired session, please sign in again' });
+  }
+}
+
+// Restricts a route to one or more roles, e.g. requireRole('canteen_owner')
+function requireRole(...allowedRoles) {
+  return (req, res, next) => {
+    if (!req.user || !allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ error: 'You do not have permission to do this' });
+    }
+    next();
+  };
+}
+
+module.exports = { requireAuth, requireRole };

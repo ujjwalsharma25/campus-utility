@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: campus-utility
+    runtime: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: MONGO_URI
+        sync: false          # paste your Atlas connection string in the Render dashboard
+      - key: JWT_SECRET
+        generateValue: true  # Render creates a long random secret for you
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: PAYEE_VPA
+        value: miet-canteen@upi
+      - key: PAYEE_NAME
+        value: MIET Campus Utility
+      - key: DEMO_SKIP_PAYMENT
+        value: "true"
+      - key: VITE_PAYEE_VPA
+        value: miet-canteen@upi
+      - key: VITE_PAYEE_NAME
+        value: MIET Campus Utility
+      - key: VITE_DEMO_SKIP_PAYMENT
+        value: "true"
